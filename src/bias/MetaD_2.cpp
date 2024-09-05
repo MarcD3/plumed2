@@ -46,7 +46,7 @@ namespace PLMD
   namespace bias
   {
 
-    //+PLUMEDOC BIAS METAD
+    //+PLUMEDOC BIAS METAD_2, Marc's test duplicate file.
     /*
     Used to performed metadynamics on one or more collective variables.
 
@@ -372,7 +372,7 @@ namespace PLMD
     */
     //+ENDPLUMEDOC
 
-    class MetaD : public Bias
+    class MetaD_2 : public Bias
     {
 
     private:
@@ -483,16 +483,16 @@ namespace PLMD
       string fmt;
 
     public:
-      explicit MetaD(const ActionOptions &);
+      explicit MetaD_2(const ActionOptions &);
       void calculate() override;
       void update() override;
       static void registerKeywords(Keywords &keys);
       bool checkNeedsGradients() const override;
     };
 
-    PLUMED_REGISTER_ACTION(MetaD, "METAD")
+    PLUMED_REGISTER_ACTION(MetaD_2, "METAD_2")
 
-    void MetaD::registerKeywords(Keywords &keys)
+    void MetaD_2::registerKeywords(Keywords &keys)
     {
       Bias::registerKeywords(keys);
       keys.addOutputComponent("rbias", "CALC_RCT", "the instantaneous value of the bias normalized using the \\f$c(t)\\f$ reweighting factor [rbias=bias-rct]."
@@ -557,47 +557,47 @@ namespace PLMD
       keys.use("UPDATE_UNTIL");
     }
 
-    const std::string MetaD::tempering_names_[1][2] = {{"TT", "transition tempered"}};
+    const std::string MetaD_2::tempering_names_[1][2] = {{"TT", "transition tempered"}};
 
-    void MetaD::registerTemperingKeywords(const std::string &name_stem, const std::string &name, Keywords &keys)
+    void MetaD_2::registerTemperingKeywords(const std::string &name_stem, const std::string &name, Keywords &keys)
     {
       keys.add("optional", name_stem + "BIASFACTOR", "use " + name + " metadynamics with this bias factor.  Please note you must also specify temp");
       keys.add("optional", name_stem + "BIASTHRESHOLD", "use " + name + " metadynamics with this bias threshold.  Please note you must also specify " + name_stem + "BIASFACTOR");
       keys.add("optional", name_stem + "ALPHA", "use " + name + " metadynamics with this hill size decay exponent parameter.  Please note you must also specify " + name_stem + "BIASFACTOR");
     }
 
-    MetaD::MetaD(const ActionOptions &ao) : PLUMED_BIAS_INIT(ao),
-                                            // Grid stuff initialization
-                                            wgridstride_(0), grid_(false),
-                                            // Metadynamics basic parameters
-                                            height0_(std::numeric_limits<double>::max()), biasf_(-1.0), dampfactor_(0.0),
-                                            tt_specs_(false, "TT", "Transition Tempered", -1.0, 0.0, 1.0),
-                                            kbt_(0.0),
-                                            stride_(0), welltemp_(false),
-                                            // frequency adaptive
-                                            current_stride(0),
-                                            freq_adaptive_(false),
-                                            fa_update_frequency_(0),
-                                            fa_max_stride_(0),
-                                            fa_min_acceleration_(1.0),
-                                            // Other stuff
-                                            adaptive_(FlexibleBin::none),
-                                            // Multiple walkers initialization
-                                            mw_n_(1), mw_dir_(""), mw_id_(0), mw_rstride_(1),
-                                            walkers_mpi(false), mpi_nw_(0), mpi_mw_(0),
-                                            // Flying Gaussian
-                                            flying(false),
-                                            acceleration(false), acc(0.0), acc_restart_mean_(0.0),
-                                            calc_max_bias_(false), max_bias_(0.0),
-                                            calc_transition_bias_(false), transition_bias_(0.0),
-                                            // Interval initialization
-                                            uppI_(-1), lowI_(-1), doInt_(false),
-                                            isFirstStep(true),
-                                            calc_rct_(false),
-                                            reweight_factor_(0.0),
-                                            rct_ustride_(1),
-                                            work_(0),
-                                            last_step_warn_grid(0)
+    MetaD_2::MetaD_2(const ActionOptions &ao) : PLUMED_BIAS_INIT(ao),
+                                                // Grid stuff initialization
+                                                wgridstride_(0), grid_(false),
+                                                // Metadynamics basic parameters
+                                                height0_(std::numeric_limits<double>::max()), biasf_(-1.0), dampfactor_(0.0),
+                                                tt_specs_(false, "TT", "Transition Tempered", -1.0, 0.0, 1.0),
+                                                kbt_(0.0),
+                                                stride_(0), welltemp_(false),
+                                                // frequency adaptive
+                                                current_stride(0),
+                                                freq_adaptive_(false),
+                                                fa_update_frequency_(0),
+                                                fa_max_stride_(0),
+                                                fa_min_acceleration_(1.0),
+                                                // Other stuff
+                                                adaptive_(FlexibleBin::none),
+                                                // Multiple walkers initialization
+                                                mw_n_(1), mw_dir_(""), mw_id_(0), mw_rstride_(1),
+                                                walkers_mpi(false), mpi_nw_(0), mpi_mw_(0),
+                                                // Flying Gaussian
+                                                flying(false),
+                                                acceleration(false), acc(0.0), acc_restart_mean_(0.0),
+                                                calc_max_bias_(false), max_bias_(0.0),
+                                                calc_transition_bias_(false), transition_bias_(0.0),
+                                                // Interval initialization
+                                                uppI_(-1), lowI_(-1), doInt_(false),
+                                                isFirstStep(true),
+                                                calc_rct_(false),
+                                                reweight_factor_(0.0),
+                                                rct_ustride_(1),
+                                                work_(0),
+                                                last_step_warn_grid(0)
     {
       // parse the flexible hills
       string adaptiveoption;
@@ -1533,7 +1533,7 @@ namespace PLMD
       bool concurrent = false;
       const ActionSet &actionSet(plumed.getActionSet());
       for (const auto &p : actionSet)
-        if (dynamic_cast<MetaD *>(p.get()))
+        if (dynamic_cast<MetaD_2 *>(p.get()))
         {
           concurrent = true;
           break;
@@ -1594,7 +1594,7 @@ namespace PLMD
       log << "\n";
     }
 
-    void MetaD::readTemperingSpecs(TemperingSpecs &t_specs)
+    void MetaD_2::readTemperingSpecs(TemperingSpecs &t_specs)
     {
       // Set global tempering parameters.
       parse(t_specs.name_stem + "BIASFACTOR", t_specs.biasf);
@@ -1622,7 +1622,7 @@ namespace PLMD
       }
     }
 
-    void MetaD::logTemperingSpecs(const TemperingSpecs &t_specs)
+    void MetaD_2::logTemperingSpecs(const TemperingSpecs &t_specs)
     {
       log.printf("  %s bias factor %f\n", t_specs.name.c_str(), t_specs.biasf);
       log.printf("  KbT %f\n", kbt_);
@@ -1632,7 +1632,7 @@ namespace PLMD
         log.printf("  %s decay shape parameter alpha %f\n", t_specs.name.c_str(), t_specs.alpha);
     }
 
-    void MetaD::readGaussians(IFile *ifile)
+    void MetaD_2::readGaussians(IFile *ifile)
     {
       unsigned ncv = getNumberOfArguments();
       vector<double> center(ncv);
@@ -1659,7 +1659,7 @@ namespace PLMD
       log.printf("      %d Gaussians read\n", nhills);
     }
 
-    void MetaD::writeGaussian(const Gaussian &hill, OFile &file)
+    void MetaD_2::writeGaussian(const Gaussian &hill, OFile &file)
     {
       unsigned ncv = getNumberOfArguments();
       file.printField("time", getTimeStep() * getStep());
@@ -1722,7 +1722,7 @@ namespace PLMD
       file.printField();
     }
 
-    void MetaD::addGaussian(const Gaussian &hill)
+    void MetaD_2::addGaussian(const Gaussian &hill)
     {
       if (!grid_)
         hills_.push_back(hill);
@@ -1772,7 +1772,7 @@ namespace PLMD
       }
     }
 
-    vector<unsigned> MetaD::getGaussianSupport(const Gaussian &hill)
+    vector<unsigned> MetaD_2::getGaussianSupport(const Gaussian &hill)
     {
       vector<unsigned> nneigh;
       vector<double> cutoff;
@@ -1846,7 +1846,7 @@ namespace PLMD
       return nneigh;
     }
 
-    double MetaD::getBiasAndDerivatives(const vector<double> &cv, double *der)
+    double MetaD_2::getBiasAndDerivatives(const vector<double> &cv, double *der)
     {
       double bias = 0.0;
       if (!grid_)
@@ -1889,7 +1889,7 @@ namespace PLMD
       return bias;
     }
 
-    double MetaD::getGaussianNormalization(const Gaussian &hill)
+    double MetaD_2::getGaussianNormalization(const Gaussian &hill)
     {
       double norm = 1;
       unsigned ncv = hill.center.size();
@@ -1920,7 +1920,7 @@ namespace PLMD
       return norm * pow(2 * pi, static_cast<double>(ncv) / 2.0);
     }
 
-    double MetaD::evaluateGaussian(const vector<double> &cv, const Gaussian &hill, double *der)
+    double MetaD_2::evaluateGaussian(const vector<double> &cv, const Gaussian &hill, double *der)
     {
       double dp2 = 0.0;
       double bias = 0.0;
@@ -2021,7 +2021,7 @@ namespace PLMD
       return bias;
     }
 
-    double MetaD::getHeight(const vector<double> &cv)
+    double MetaD_2::getHeight(const vector<double> &cv)
     {
       double height = height0_;
       if (welltemp_)
@@ -2056,7 +2056,7 @@ namespace PLMD
       return height;
     }
 
-    void MetaD::temperHeight(double &height, const TemperingSpecs &t_specs, const double tempering_bias)
+    void MetaD_2::temperHeight(double &height, const TemperingSpecs &t_specs, const double tempering_bias)
     {
       if (t_specs.alpha == 1.0)
       {
@@ -2068,7 +2068,7 @@ namespace PLMD
       }
     }
 
-    void MetaD::calculate()
+    void MetaD_2::calculate()
     {
       // this is because presently there is no way to properly pass information
       // on adaptive hills (diff) after exchanges:
@@ -2122,7 +2122,7 @@ namespace PLMD
       }
     }
 
-    void MetaD::update()
+    void MetaD_2::update()
     {
       vector<double> cv(getNumberOfArguments());
       vector<double> thissigma;
@@ -2316,7 +2316,7 @@ namespace PLMD
     }
 
     /// takes a pointer to the file and a template string with values v and gives back the next center, sigma and height
-    bool MetaD::scanOneHill(IFile *ifile, vector<Value> &tmpvalues, vector<double> &center, vector<double> &sigma, double &height, bool &multivariate)
+    bool MetaD_2::scanOneHill(IFile *ifile, vector<Value> &tmpvalues, vector<double> &center, vector<double> &sigma, double &height, bool &multivariate)
     {
       double dummy;
       multivariate = false;
@@ -2411,7 +2411,7 @@ namespace PLMD
       }
     }
 
-    void MetaD::computeReweightingFactor()
+    void MetaD_2::computeReweightingFactor()
     {
       if (biasf_ == 1.0)
       { // in this case we have no bias, so reweight factor is 0.0
@@ -2448,7 +2448,7 @@ namespace PLMD
       getPntrToComponent("rct")->set(reweight_factor_);
     }
 
-    double MetaD::getTransitionBarrierBias()
+    double MetaD_2::getTransitionBarrierBias()
     {
 
       // If there is only one well of interest, return the bias at that well point.
@@ -2488,7 +2488,7 @@ namespace PLMD
       }
     }
 
-    void MetaD::updateFrequencyAdaptiveStride()
+    void MetaD_2::updateFrequencyAdaptiveStride()
     {
       plumed_massert(freq_adaptive_, "should only be used if frequency adaptive metadynamics is enabled");
       plumed_massert(acceleration, "frequency adaptive metadynamics can only be used if the acceleration factor is calculated");
@@ -2508,7 +2508,7 @@ namespace PLMD
       getPntrToComponent("pace")->set(current_stride);
     }
 
-    bool MetaD::checkNeedsGradients() const
+    bool MetaD_2::checkNeedsGradients() const
     {
       if (adaptive_ == FlexibleBin::geometry)
       {
